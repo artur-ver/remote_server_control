@@ -14,7 +14,7 @@
   
   <div class="card bg-dark border-secondary">
       <div class="card-header border-secondary d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#terminalCollapse" role="button">
-          <h6 class="mb-0"><i class="bi bi-terminal-fill me-2"></i>Terminal Console</h6>
+          <h6 class="mb-0"><i class="bi bi-terminal-fill me-2"></i>{{ t('scripts.terminal_console') }}</h6>
           <i class="bi bi-chevron-down"></i>
       </div>
       <div class="collapse show" id="terminalCollapse">
@@ -81,7 +81,7 @@
           <td>
             <div class="d-flex gap-2 align-items-center">
               {% if s.status == 'running' %}
-                <form action="{{ url_for('stop_script', name=s.name) }}" method="post" onsubmit="return confirm('Stop script?')">
+                <form action="{{ url_for('stop_script', name=s.name) }}" method="post" onsubmit="return confirm('{{ t('scripts.confirm_stop') }}')">
                   <button type="submit" class="btn btn-sm btn-danger btn-icon">
                     <i class="bi bi-stop-fill"></i> {{ t('scripts.stop') }}
                   </button>

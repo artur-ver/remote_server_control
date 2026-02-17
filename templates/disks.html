@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Диски</h5>
+  <h5 class="mb-2">{{ t('nav.disks') }}</h5>
   <div class="table-responsive mb-3">
     <table class="table table-dark table-hover table-sm align-middle">
-      <thead><tr><th>Устройство</th><th>Точка монтирования</th><th>ФС</th><th>Всего</th><th>Занято</th><th>%</th></tr></thead>
+      <thead><tr><th>{{ t('disk.device') }}</th><th>{{ t('disk.mount') }}</th><th>{{ t('disk.fs') }}</th><th>{{ t('disk.total') }}</th><th>{{ t('disk.used') }}</th><th>{{ t('disk.percent') }}</th></tr></thead>
       <tbody>
         {% for p in parts %}
         <tr>
@@ -20,24 +20,24 @@
   </div>
   <div class="card">
     <div class="card-body">
-      <h6 class="card-title">Анализ каталога (уровень 1)</h6>
+      <h6 class="card-title">{{ t('disk.analyze_title') }}</h6>
       <form class="row g-2 mb-2" method="get">
         <div class="col-12 col-md-8">
-          <input type="text" class="form-control" name="path" placeholder="C:\path\to\dir или относительный к BASE_DIR" value="{{ du_path or '' }}">
+          <input type="text" class="form-control" name="path" placeholder="{{ t('disk.path_placeholder') }}" value="{{ du_path or '' }}">
         </div>
         <div class="col-12 col-md-4">
-          <button class="btn btn-primary">Показать</button>
+          <button class="btn btn-primary">{{ t('disk.show_btn') }}</button>
         </div>
       </form>
       {% if du_items is not none %}
       <div class="table-responsive">
         <table class="table table-dark table-hover table-sm align-middle">
-          <thead><tr><th>Имя</th><th>Тип</th><th>Размер</th></tr></thead>
+          <thead><tr><th>{{ t('table.name') }}</th><th>{{ t('table.type') }}</th><th>{{ t('table.size') }}</th></tr></thead>
           <tbody>
             {% for i in du_items %}
             <tr>
               <td class="monospace">{{ i.name }}</td>
-              <td>{{ 'Каталог' if i.is_dir else 'Файл' }}</td>
+              <td>{{ t('type.dir') if i.is_dir else t('type.file') }}</td>
               <td>{{ i.size|bytes_human }}</td>
             </tr>
             {% endfor %}

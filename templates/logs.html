@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Логи</h5>
+  <h5 class="mb-2">{{ t('nav.logs') }}</h5>
   <div class="row g-3">
     <div class="col-12 col-lg-5">
       <div class="card h-100">
@@ -9,9 +9,9 @@
             <table class="table table-dark table-hover table-sm align-middle mb-0">
               <thead class="sticky-top bg-dark">
                 <tr>
-                  <th>Файл</th>
-                  <th>Размер</th>
-                  <th>Дата</th>
+                  <th>{{ t('logs.file') }}</th>
+                  <th>{{ t('logs.size') }}</th>
+                  <th>{{ t('logs.date') }}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -40,14 +40,14 @@
         <div class="card h-100">
           <div class="card-header py-2 d-flex justify-content-between align-items-center">
             <span class="small monospace text-truncate">{{ path }}</span>
-            <span class="badge bg-secondary">Last 400 lines</span>
+            <span class="badge bg-secondary">{{ t('logs.last_lines') }}</span>
           </div>
           <div class="card-body p-0">
             <pre class="monospace m-0 p-2" style="max-height: 70vh; overflow: auto;">{{ content }}</pre>
           </div>
         </div>
       {% else %}
-        <div class="alert alert-info">Выберите файл лога для просмотра</div>
+        <div class="alert alert-info">{{ t('logs.select_msg') }}</div>
       {% endif %}
     </div>
   </div>

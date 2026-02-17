@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Процессы</h5>
+  <h5 class="mb-2">{{ t('nav.processes') }}</h5>
   <div class="table-responsive">
     <table class="table table-dark table-hover table-sm align-middle">
       <thead>
         <tr>
-          <th>PID</th><th>Имя</th><th>Пользователь</th><th>CPU %</th><th>Память</th><th></th>
+          <th>{{ t('proc.pid') }}</th><th>{{ t('proc.name') }}</th><th>{{ t('proc.user') }}</th><th>{{ t('proc.cpu') }}</th><th>{{ t('proc.mem') }}</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -17,9 +17,9 @@
           <td>{{ p.cpu or 0 }}</td>
           <td>{{ p.mem|bytes_human }}</td>
           <td class="text-end">
-            <form method="post" action="{{ url_for('processes_kill') }}" onsubmit="return confirm('Завершить процесс {{ p.pid }}?')">
+            <form method="post" action="{{ url_for('processes_kill') }}" onsubmit="return confirm('{{ t('proc.kill_confirm') }}')">
               <input type="hidden" name="pid" value="{{ p.pid }}">
-              <button class="btn btn-sm btn-outline-danger">Kill</button>
+              <button class="btn btn-sm btn-outline-danger">{{ t('proc.kill') }}</button>
             </form>
           </td>
         </tr>

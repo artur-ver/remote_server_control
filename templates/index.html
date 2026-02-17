@@ -8,7 +8,7 @@
         <div class="card h-100 text-bg-primary-subtle border-0">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-folder2-open me-1"></i> {{ t('nav.files') }}</h5>
-            <p class="card-text">Browse, upload, download, edit.</p>
+            <p class="card-text">{{ t('home.files_desc') }}</p>
             <a href="{{ url_for('browse') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
           </div>
         </div>
@@ -17,7 +17,7 @@
         <div class="card h-100 text-bg-primary-subtle border-0">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-terminal me-1"></i> {{ t('nav.terminal') }}</h5>
-            <p class="card-text">Non-interactive command execution.</p>
+            <p class="card-text">{{ t('home.terminal_desc') }}</p>
             <a href="{{ url_for('terminal') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
           </div>
         </div>
@@ -26,7 +26,7 @@
         <div class="card h-100 text-bg-primary-subtle border-0">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-play-fill me-1"></i> {{ t('nav.scripts') }}</h5>
-            <p class="card-text">Run .py and .bat from scripts folder.</p>
+            <p class="card-text">{{ t('home.scripts_desc') }}</p>
             <a href="{{ url_for('scripts') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
           </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="card h-100 text-bg-primary-subtle border-0">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-activity me-1"></i> {{ t('nav.monitor') }}</h5>
-            <p class="card-text">CPU, Memory, Disk, Network, GPU charts.</p>
+            <p class="card-text">{{ t('home.monitor_desc') }}</p>
             <a href="{{ url_for('monitor') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
           </div>
         </div>
@@ -43,18 +43,18 @@
       <div class="col-12 col-md-8">
         <div class="card h-100">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-tools me-1"></i> Инструменты</h5>
+            <h5 class="card-title"><i class="bi bi-tools me-1"></i> {{ t('nav.tools') }}</h5>
             <div class="row g-2">
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('processes') }}">Процессы</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('services') }}">Сервисы</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('ports') }}">Порты</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('network') }}">Сеть</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('disks') }}">Диски</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('system_info') }}">Система</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('tasks') }}">Планировщик</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('logs') }}">Логи</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('backup') }}">Бэкап</a></div>
-              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-danger" href="{{ url_for('power') }}">Питание</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('processes') }}">{{ t('nav.processes') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('services') }}">{{ t('nav.services') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('ports') }}">{{ t('nav.ports') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('network') }}">{{ t('nav.network') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('disks') }}">{{ t('nav.disks') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('system_info') }}">{{ t('nav.system') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('tasks') }}">{{ t('nav.tasks') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('logs') }}">{{ t('nav.logs') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('backup') }}">{{ t('nav.backup') }}</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-danger" href="{{ url_for('power') }}">{{ t('nav.power') }}</a></div>
             </div>
           </div>
         </div>

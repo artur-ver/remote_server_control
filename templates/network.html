@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Сеть</h5>
+  <h5 class="mb-2">{{ t('nav.network') }}</h5>
   <div class="row g-3">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          <h6 class="card-title">Интерфейсы</h6>
+          <h6 class="card-title">{{ t('net.interfaces') }}</h6>
           <div class="table-responsive">
             <table class="table table-dark table-hover table-sm align-middle">
               <thead>
                 <tr>
-                  <th>Интерфейс</th>
-                  <th>Тип</th>
-                  <th>Адрес</th>
-                  <th>Маска</th>
+                  <th>{{ t('net.iface') }}</th>
+                  <th>{{ t('net.type') }}</th>
+                  <th>{{ t('net.addr') }}</th>
+                  <th>{{ t('net.netmask') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -34,11 +34,11 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          <h6 class="card-title">Ping</h6>
+          <h6 class="card-title">{{ t('net.ping') }}</h6>
           <form method="post" class="mb-2">
             <div class="input-group">
               <input type="text" name="host" class="form-control" placeholder="example.com" value="{{ ping_host or '' }}" required>
-              <button class="btn btn-primary">Ping</button>
+              <button class="btn btn-primary">{{ t('net.ping_btn') }}</button>
             </div>
           </form>
           {% if ping_out is not none %}

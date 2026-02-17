@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Бэкап</h5>
-  <div class="alert alert-warning">Создание zip до 100 MB. Путь должен быть в пределах BASE_DIR.</div>
+  <h5 class="mb-2">{{ t('nav.backup') }}</h5>
+  <div class="alert alert-warning">{{ t('backup.warning') }}</div>
   <form method="post" class="row g-2">
     <div class="col-12 col-md-8">
-      <input type="text" name="path" class="form-control" placeholder="относительный путь от BASE_DIR или имя файла" required>
+      <input type="text" name="path" class="form-control" placeholder="{{ t('backup.path_ph') }}" required>
     </div>
     <div class="col-12 col-md-4">
-      <button class="btn btn-primary">Скачать ZIP</button>
+      <button class="btn btn-primary">{{ t('backup.download_btn') }}</button>
     </div>
   </form>
 {% endblock %}

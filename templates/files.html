@@ -20,7 +20,7 @@
         {% endif %}
       </ol>
     </nav>
-    <input id="filesFilter" class="form-control form-control-sm search-input" placeholder="Фильтр по имени">
+    <input id="filesFilter" class="form-control form-control-sm search-input" placeholder="{{ t('files.filter_placeholder') }}">
   </div>
   <form class="mb-3" method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
     <div class="row g-2 align-items-end">

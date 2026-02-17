@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Сервисы</h5>
+  <h5 class="mb-2">{{ t('nav.services') }}</h5>
   <div class="table-responsive">
     <table class="table table-dark table-hover table-sm align-middle">
-      <thead><tr><th>Имя</th><th>Отображаемое</th><th>Статус</th><th></th></tr></thead>
+      <thead><tr><th>{{ t('serv.name') }}</th><th>{{ t('serv.display') }}</th><th>{{ t('serv.status') }}</th><th></th></tr></thead>
       <tbody>
         {% for s in services %}
         <tr>
@@ -14,12 +14,12 @@
             <form method="post" action="{{ url_for('services_action') }}" class="d-inline">
               <input type="hidden" name="name" value="{{ s.service_name }}">
               <input type="hidden" name="action" value="start">
-              <button class="btn btn-sm btn-outline-success">Start</button>
+              <button class="btn btn-sm btn-outline-success">{{ t('serv.start') }}</button>
             </form>
             <form method="post" action="{{ url_for('services_action') }}" class="d-inline">
               <input type="hidden" name="name" value="{{ s.service_name }}">
               <input type="hidden" name="action" value="stop">
-              <button class="btn btn-sm btn-outline-danger">Stop</button>
+              <button class="btn btn-sm btn-outline-danger">{{ t('serv.stop') }}</button>
             </form>
           </td>
         </tr>

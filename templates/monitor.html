@@ -10,7 +10,7 @@
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">{{ t('monitor.cpu') }}</h6>
-          <div class="small text-muted mb-2">Freq: <span id="cpuFreq">-</span>, Cores: <span id="cpuCores">-</span>, Threads: <span id="cpuThreads">-</span></div>
+          <div class="small text-muted mb-2">{{ t('mon.freq') }}: <span id="cpuFreq">-</span>, {{ t('mon.cores') }}: <span id="cpuCores">-</span>, {{ t('mon.threads') }}: <span id="cpuThreads">-</span></div>
           <canvas id="cpuChart" height="140"></canvas>
         </div>
       </div>
@@ -19,7 +19,7 @@
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">{{ t('monitor.mem') }}</h6>
-          <div class="small text-muted mb-2">Used: <span id="memUsed">-</span> / <span id="memTotal">-</span></div>
+          <div class="small text-muted mb-2">{{ t('mon.used') }}: <span id="memUsed">-</span> / <span id="memTotal">-</span></div>
           <canvas id="memChart" height="140"></canvas>
         </div>
       </div>
@@ -28,7 +28,7 @@
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">{{ t('monitor.net') }}</h6>
-          <div class="small text-muted mb-2">Total: ↑ <span id="netUpTotal">-</span> / ↓ <span id="netDownTotal">-</span></div>
+          <div class="small text-muted mb-2">{{ t('mon.total') }}: ↑ <span id="netUpTotal">-</span> / ↓ <span id="netDownTotal">-</span></div>
           <canvas id="netChart" height="140"></canvas>
         </div>
       </div>
@@ -37,7 +37,7 @@
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">{{ t('monitor.disk') }}</h6>
-          <div class="small text-muted mb-2">Used: <span id="diskUsed">-</span> / <span id="diskTotal">-</span> (<span id="diskPercent">-</span>%)</div>
+          <div class="small text-muted mb-2">{{ t('mon.used') }}: <span id="diskUsed">-</span> / <span id="diskTotal">-</span> (<span id="diskPercent">-</span>%)</div>
           <canvas id="diskChart" height="140"></canvas>
         </div>
       </div>
@@ -61,10 +61,10 @@
     const ctxDisk = document.getElementById('diskChart').getContext('2d');
     const ctxGpu = document.getElementById('gpuChart').getContext('2d');
     const commonOpts = { responsive: true, animation: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: true } }, spanGaps: true };
-    const cpuChart = new Chart(ctxCpu, { type: 'line', data: { labels: [], datasets: [{ label: 'CPU %', data: [], borderColor: '#3ea6ff' }] }, options: commonOpts });
-    const memChart = new Chart(ctxMem, { type: 'line', data: { labels: [], datasets: [{ label: 'Memory %', data: [], borderColor: '#6dd5b0' }] }, options: commonOpts });
-    const netChart = new Chart(ctxNet, { type: 'line', data: { labels: [], datasets: [{ label: 'Up', data: [], borderColor: '#ffb74d' }, { label: 'Down', data: [], borderColor: '#ff6e6e' }] }, options: commonOpts });
-    const diskChart = new Chart(ctxDisk, { type: 'line', data: { labels: [], datasets: [{ label: 'Read', data: [], borderColor: '#8e99f3' }, { label: 'Write', data: [], borderColor: '#b388ff' }] }, options: commonOpts });
+    const cpuChart = new Chart(ctxCpu, { type: 'line', data: { labels: [], datasets: [{ label: '{{ t('mon.cpu_pct') }}', data: [], borderColor: '#3ea6ff' }] }, options: commonOpts });
+    const memChart = new Chart(ctxMem, { type: 'line', data: { labels: [], datasets: [{ label: '{{ t('mon.mem_pct') }}', data: [], borderColor: '#6dd5b0' }] }, options: commonOpts });
+    const netChart = new Chart(ctxNet, { type: 'line', data: { labels: [], datasets: [{ label: '{{ t('mon.up') }}', data: [], borderColor: '#ffb74d' }, { label: '{{ t('mon.down') }}', data: [], borderColor: '#ff6e6e' }] }, options: commonOpts });
+    const diskChart = new Chart(ctxDisk, { type: 'line', data: { labels: [], datasets: [{ label: '{{ t('mon.read') }}', data: [], borderColor: '#8e99f3' }, { label: '{{ t('mon.write') }}', data: [], borderColor: '#b388ff' }] }, options: commonOpts });
     const gpuChart = new Chart(ctxGpu, { type: 'line', data: { labels: [], datasets: [] }, options: commonOpts });
     let prev = null;
     function fmtBytes(v) {

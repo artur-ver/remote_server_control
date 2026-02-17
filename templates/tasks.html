@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Планировщик задач</h5>
+  <h5 class="mb-2">{{ t('nav.tasks') }}</h5>
   <div class="table-responsive">
     <table class="table table-dark table-hover table-sm align-middle">
-      <thead><tr><th>Имя</th><th>Статус</th><th>Следующий запуск</th><th></th></tr></thead>
+      <thead><tr><th>{{ t('tasks.name') }}</th><th>{{ t('tasks.status') }}</th><th>{{ t('tasks.next_run') }}</th><th></th></tr></thead>
       <tbody>
         {% for t in tasks %}
         <tr>
@@ -13,7 +13,7 @@
           <td class="text-end">
             <form method="post" action="{{ url_for('tasks') }}">
               <input type="hidden" name="name" value="{{ t.name }}">
-              <button class="btn btn-sm btn-outline-primary">Запустить</button>
+              <button class="btn btn-sm btn-outline-primary">{{ t('tasks.run_btn') }}</button>
             </form>
           </td>
         </tr>

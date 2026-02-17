@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-  <h5 class="mb-2">Порты</h5>
+  <h5 class="mb-2">{{ t('nav.ports') }}</h5>
   <div class="table-responsive">
     <table class="table table-dark table-hover table-sm align-middle">
-      <thead><tr><th>Протокол</th><th>Локальный адрес</th><th>Удалённый адрес</th><th>Состояние</th><th>PID</th><th>Процесс</th></tr></thead>
+      <thead><tr><th>{{ t('ports.proto') }}</th><th>{{ t('ports.local') }}</th><th>{{ t('ports.remote') }}</th><th>{{ t('ports.status') }}</th><th>{{ t('ports.pid') }}</th><th>{{ t('ports.process') }}</th></tr></thead>
       <tbody>
         {% for e in entries %}
         <tr>
