@@ -1,84 +1,252 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="d-flex align-items-center justify-content-between">
-    <h5 class="mb-0">{{ t('nav.terminal') }}</h5>
-    <span class="text-muted monospace">{{ base_dir }}</span>
-  </div>
-  <hr>
-  <form method="post" action="{{ url_for('terminal_exec') }}" class="mb-3">
-    <div class="row g-2">
-      <div class="col-12 col-md-6">
-        <label class="form-label">{{ t('term.command') }}</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-chevron-right"></i></span>
-          <input type="text" class="form-control" name="cmd" placeholder="dir" value="{{ last_cmd or '' }}" required>
-          <button class="btn btn-primary btn-icon" type="submit"><i class="bi bi-play-fill"></i> {{ t('term.execute') }}</button>
-        </div>
+<div class="row h-100 flex-column">
+  <div class="col-12 flex-grow-1 d-flex flex-column" style="{{ 'height: 100%;' if hide_nav else 'height: calc(100vh - 120px);' }}">
+    
+    <!-- Terminal Header -->
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="mb-0">{{ t('nav.terminal') }}</h5>
+        <span class="badge bg-secondary monospace">{{ current_cwd }}</span>
+        <span class="badge bg-info">{{ default_shell }}</span>
       </div>
-      <div class="col-6 col-md-2">
-        <label class="form-label">{{ t('term.shell') }}</label>
-        <select class="form-select" name="shell">
-          <option value="cmd">cmd</option>
-          <option value="powershell">powershell</option>
-        </select>
-      </div>
-      <div class="col-6 col-md-4">
-        <label class="form-label">{{ t('term.cwd') }}</label>
-        <input type="text" class="form-control monospace" name="cwd" placeholder="" value="">
-      </div>
-    </div>
-  </form>
-  <div class="mb-3">
-    <div class="d-flex flex-wrap gap-2">
-      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="dir">dir</button>
-      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="whoami">whoami</button>
-      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="ipconfig">ipconfig</button>
-      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="systeminfo">systeminfo</button>
-      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="tasklist">tasklist</button>
-      <form method="post" action="{{ url_for('terminal_clear') }}" class="d-inline">
-        <button class="btn btn-sm btn-outline-warning">{{ t('term.quick.clear') }}</button>
-      </form>
-    </div>
-  </div>
-  {% if history %}
-    <div class="mb-2">
-      <div class="text-muted mb-1">{{ t('term.history') }}:</div>
-      <div class="d-flex flex-wrap gap-2">
-        {% for item in history %}
-          <span class="badge bg-secondary quick-cmd" data-cmd="{{ item }}">{{ item }}</span>
-        {% endfor %}
-      </div>
-    </div>
-  {% endif %}
-  {% if output is not none %}
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="text-muted">{{ t('term.return_code') }}: {{ code if code is not none else "-" }}</div>
       <div class="d-flex gap-2">
-        <button id="copyBtn" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-clipboard"></i> {{ t('ui.copy') }}</button>
-        <button id="wrapBtn" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-text-wrap"></i> {{ t('ui.wrap') }}</button>
+         <form method="post" action="{{ url_for('terminal_clear') }}" class="d-inline">
+            <button class="btn btn-sm btn-outline-secondary" title="Clear Screen"><i class="bi bi-eraser"></i> Clear</button>
+         </form>
+         <form method="post" action="{{ url_for('terminal_reset') }}" class="d-inline" onsubmit="return confirm('Reset terminal history and path?')">
+            <button class="btn btn-sm btn-outline-danger" title="Reset Session"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+         </form>
       </div>
     </div>
-    <div class="code-box"><pre id="codeText" class="monospace mb-0">{{ output }}</pre></div>
-    <script>
-      document.querySelectorAll('.quick-cmd').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+
+    <!-- Terminal Output Area -->
+    <div class="flex-grow-1 bg-black p-2 rounded mb-2 overflow-auto terminal-window" id="terminalOutput" style="font-family: var(--rsc-mono); font-size: 0.9rem;">
+      <div class="text-muted">RSC Terminal [Version 2.0]</div>
+      <div class="text-muted">Running on {{ 'Windows' if is_windows else 'Linux' }}</div>
+      <br>
+      
+      {% for entry in output_history %}
+        <div class="mb-2">
+          <div class="text-secondary prompt">
+            <span class="text-success user">root@rsc</span>:<span class="text-primary path">{{ entry.cwd }}</span>$ <span class="text-light">{{ entry.cmd }}</span>
+          </div>
+          {% if entry.output %}
+            <div class="text-light pre-wrap ms-2 border-start border-secondary ps-2" style="white-space: pre-wrap;">{{ entry.output }}</div>
+          {% endif %}
+          {% if entry.code != 0 %}
+             <div class="text-danger ms-2">Exit code: {{ entry.code }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      
+      <!-- Anchor for scrolling -->
+      <div id="scrollAnchor"></div>
+    </div>
+
+    <!-- Input Area -->
+    <form method="post" action="{{ url_for('terminal_exec') }}" id="termForm" class="mb-2">
+      <div class="input-group">
+        <span class="input-group-text bg-dark text-success border-secondary">
+            <i class="bi bi-chevron-right"></i>
+        </span>
+        <input type="text" class="form-control bg-dark text-light border-secondary monospace" 
+               name="cmd" id="cmdInput" 
+               placeholder="Enter command..." 
+               autocomplete="off" autofocus>
+        
+        <select class="form-select bg-dark text-light border-secondary" name="shell" id="shellSelect" style="max-width: 120px;">
+          {% if is_windows %}
+            <option value="powershell" selected>PowerShell</option>
+            <option value="cmd">CMD</option>
+          {% else %}
+            <option value="/bin/bash" selected>Bash</option>
+            <option value="/bin/sh">Sh</option>
+          {% endif %}
+        </select>
+        
+        <button class="btn btn-primary" type="submit" id="sendBtn"><i class="bi bi-play-fill"></i></button>
+      </div>
+    </form>
+
+    <!-- Quick Commands / Catalog -->
+    <div class="card bg-dark border-secondary">
+      <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted text-uppercase fw-bold">Quick Commands</small>
+            <small class="text-muted">Click to insert</small>
+        </div>
+        <div class="d-flex flex-wrap gap-2" id="quickCmds">
+            <!-- Populated by JS based on OS -->
+        </div>
+        
+        {% if cmd_history %}
+        <hr class="my-1 border-secondary">
+        <div class="d-flex flex-wrap gap-2 mt-1" id="historyBadges">
+            {% for item in cmd_history[-10:] %}
+                <span class="badge bg-secondary quick-cmd" role="button" data-cmd="{{ item }}">{{ item }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Terminal Logic
+  const termForm = document.getElementById('termForm');
+  const outputDiv = document.getElementById('terminalOutput');
+  const cmdInput = document.getElementById('cmdInput');
+  const shellSelect = document.getElementById('shellSelect');
+  const scrollAnchor = document.getElementById('scrollAnchor');
+  const cwdBadge = document.querySelector('.badge.monospace'); // Update CWD badge
+  
+  // Auto-scroll on load
+  outputDiv.scrollTop = outputDiv.scrollHeight;
+
+  // Handle Form Submit (AJAX)
+  termForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cmd = cmdInput.value.trim();
+      if (!cmd) return;
+
+      const shell = shellSelect.value;
+      
+      // Append command immediately (optimistic UI)
+      const cmdHtml = `
+        <div class="mb-2">
+          <div class="text-secondary prompt">
+            <span class="text-success user">root@rsc</span>:<span class="text-primary path">${cwdBadge.innerText}</span>$ <span class="text-light">${cmd}</span>
+          </div>
+          <div class="text-light pre-wrap ms-2 border-start border-secondary ps-2 loading-indicator">...</div>
+        </div>
+      `;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cmdHtml;
+      outputDiv.insertBefore(tempDiv, scrollAnchor);
+      outputDiv.scrollTop = outputDiv.scrollHeight;
+      
+      cmdInput.value = '';
+
+      try {
+          const formData = new FormData();
+          formData.append('cmd', cmd);
+          formData.append('shell', shell);
+          
+          const response = await fetch("{{ url_for('terminal_exec') }}?ajax=1", {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+              }
+          });
+          
+          const data = await response.json();
+          
+          // Replace loading indicator with actual output
+          const loadingEl = tempDiv.querySelector('.loading-indicator');
+          if (data.output) {
+              loadingEl.innerText = data.output;
+              loadingEl.classList.remove('loading-indicator');
+          } else {
+              loadingEl.remove();
+          }
+          
+          if (data.code !== 0) {
+              const errDiv = document.createElement('div');
+              errDiv.className = 'text-danger ms-2';
+              errDiv.innerText = `Exit code: ${data.code}`;
+              tempDiv.appendChild(errDiv);
+          }
+          
+          // Update CWD if changed
+          if (data.cwd) {
+              cwdBadge.innerText = data.cwd;
+          }
+
+          outputDiv.scrollTop = outputDiv.scrollHeight;
+
+      } catch (err) {
+          console.error(err);
+          const errHtml = `<div class="text-danger ms-2">Communication error: ${err.message}</div>`;
+          tempDiv.insertAdjacentHTML('beforeend', errHtml);
+      }
+  });
+
+  // Handle Reset/Clear via AJAX too? (Optional, but cleaner)
+  // ... (Keep existing form submission for clear/reset for now as they redirect back correctly)
+
+  // Focus input
+  cmdInput.focus();
+
+  // Quick Commands Data
+  const cmds = {
+    windows: [
+        { label: 'dir', cmd: 'dir' },
+        { label: 'ipconfig', cmd: 'ipconfig' },
+        { label: 'whoami', cmd: 'whoami' },
+        { label: 'netstat', cmd: 'netstat -an' },
+        { label: 'tasklist', cmd: 'tasklist' },
+        { label: 'systeminfo', cmd: 'systeminfo' },
+        { label: 'ping google', cmd: 'ping google.com' }
+    ],
+    linux: [
+        { label: 'ls', cmd: 'ls -la' },
+        { label: 'ip addr', cmd: 'ip addr' },
+        { label: 'whoami', cmd: 'whoami' },
+        { label: 'top', cmd: 'top -b -n 1' },
+        { label: 'ps', cmd: 'ps aux' },
+        { label: 'df', cmd: 'df -h' },
+        { label: 'free', cmd: 'free -m' }
+    ]
+  };
+
+  const isWin = {{ 'true' if is_windows else 'false' }};
+  const container = document.getElementById('quickCmds');
+  const list = isWin ? cmds.windows : cmds.linux;
+
+  list.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-sm btn-outline-secondary quick-cmd';
+      btn.textContent = item.label;
+      btn.setAttribute('data-cmd', item.cmd);
+      container.appendChild(btn);
+  });
+
+  // Handle Quick Cmd Click
+  document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('quick-cmd')) {
+          const cmd = e.target.getAttribute('data-cmd');
+          const input = document.getElementById('cmdInput');
+          input.value = cmd;
+          input.focus();
+      }
+  });
+
+  // Up/Down Arrow for History (Client-side simulation)
+  const history = {{ cmd_history | tojson }};
+  let histIdx = history.length;
+  const input = document.getElementById('cmdInput');
+
+  input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp') {
           e.preventDefault();
-          const cmd = btn.getAttribute('data-cmd');
-          const input = document.querySelector('input[name="cmd"]');
-          if (input && cmd) input.value = cmd;
-        });
-      });
-    </script>
-  {% else %}
-    <script>
-      document.querySelectorAll('.quick-cmd').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+          if (histIdx > 0) {
+              histIdx--;
+              input.value = history[histIdx];
+          }
+      } else if (e.key === 'ArrowDown') {
           e.preventDefault();
-          const cmd = btn.getAttribute('data-cmd');
-          const input = document.querySelector('input[name="cmd"]');
-          if (input && cmd) input.value = cmd;
-        });
-      });
-    </script>
-  {% endif %}
+          if (histIdx < history.length - 1) {
+              histIdx++;
+              input.value = history[histIdx];
+          } else {
+              histIdx = history.length;
+              input.value = '';
+          }
+      }
+  });
+</script>
 {% endblock %}

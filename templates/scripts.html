@@ -1,28 +1,177 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="d-flex align-items-center justify-content-between">
-    <h5 class="mb-0">{{ t('nav.scripts') }}</h5>
-    <span class="text-muted monospace">{{ config['SCRIPTS_DIR'] }}</span>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h5 class="mb-0">{{ t('nav.scripts') }}</h5>
+      <small class="text-muted monospace">{{ config['SCRIPTS_DIR'] }}</small>
+    </div>
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+      <i class="bi bi-upload"></i> {{ t('scripts.upload') }}
+    </button>
   </div>
-  <hr>
-  {% if not scripts %}
-    <div class="alert alert-warning">{{ t('scripts.none') }}</div>
-  {% else %}
-    <div class="list-group">
-      {% for s in scripts %}
-      <div class="list-group-item d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <i class="bi bi-terminal"></i>
-          <span class="monospace">{{ s.name }}</span>
-          <span class="badge bg-secondary">{{ s.name.rsplit('.', 1)[-1]|upper }}</span>
+
+  <hr class="my-3">
+  
+  <div class="card bg-dark border-secondary">
+      <div class="card-header border-secondary d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#terminalCollapse" role="button">
+          <h6 class="mb-0"><i class="bi bi-terminal-fill me-2"></i>Terminal Console</h6>
+          <i class="bi bi-chevron-down"></i>
+      </div>
+      <div class="collapse show" id="terminalCollapse">
+          <div class="card-body p-0">
+              <iframe src="{{ url_for('terminal', embedded='true') }}" style="width: 100%; height: 400px; border: none;"></iframe>
+          </div>
+      </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ t('scripts.upload') }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form class="d-flex gap-2" method="post" action="{{ url_for('run_script') }}">
-          <input type="hidden" name="script" value="{{ s.name }}">
-          <input type="text" name="args" class="form-control form-control-sm" placeholder="{{ t('scripts.args') }}">
-          <button type="submit" class="btn btn-sm btn-primary btn-icon"><i class="bi bi-play-fill"></i> {{ t('scripts.run') }}</button>
+        <form action="{{ url_for('upload_script') }}" method="post" enctype="multipart/form-data">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">{{ t('files.upload.label') }}</label>
+              <input type="file" name="file" class="form-control" required accept=".py,.bat,.sh,.ps1">
+              <div class="form-text text-muted">{{ t('msg.only_py_bat') }}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('edit.cancel') }}</button>
+            <button type="submit" class="btn btn-primary">{{ t('files.upload.button') }}</button>
+          </div>
         </form>
       </div>
-      {% endfor %}
     </div>
-  {% endif %}
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-sm align-middle">
+      <thead>
+        <tr>
+          <th>{{ t('table.name') }}</th>
+          <th>{{ t('scripts.status') }}</th>
+          <th>{{ t('table.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in scripts %}
+        <tr>
+          <td class="monospace">
+            <i class="bi bi-file-earmark-code me-2"></i>{{ s.name }}
+          </td>
+          <td>
+            {% if s.status == 'running' %}
+              <span class="badge bg-primary animate-pulse">{{ t('scripts.running') }}</span>
+            {% elif s.status == 'finished' %}
+              <span class="badge bg-success">{{ t('scripts.finished') }}</span>
+            {% elif s.status == 'error' %}
+              <span class="badge bg-danger">{{ t('scripts.error') }}</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ t('scripts.stopped') }}</span>
+            {% endif %}
+            {% if s.returncode is not none %}
+              <small class="text-muted ms-1">({{ s.returncode }})</small>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex gap-2 align-items-center">
+              {% if s.status == 'running' %}
+                <form action="{{ url_for('stop_script', name=s.name) }}" method="post" onsubmit="return confirm('Stop script?')">
+                  <button type="submit" class="btn btn-sm btn-danger btn-icon">
+                    <i class="bi bi-stop-fill"></i> {{ t('scripts.stop') }}
+                  </button>
+                </form>
+                <button class="btn btn-sm btn-info btn-icon" onclick="viewOutput('{{ s.name }}')">
+                  <i class="bi bi-terminal"></i> {{ t('scripts.output') }}
+                </button>
+              {% else %}
+                <form class="d-flex gap-2" method="post" action="{{ url_for('run_script') }}">
+                  <input type="hidden" name="script" value="{{ s.name }}">
+                  <input type="text" name="args" class="form-control form-control-sm" placeholder="{{ t('scripts.args') }}" style="width: 150px;">
+                  <button type="submit" class="btn btn-sm btn-success btn-icon">
+                    <i class="bi bi-play-fill"></i> {{ t('scripts.run') }}
+                  </button>
+                </form>
+                <button class="btn btn-sm btn-secondary btn-icon" onclick="viewOutput('{{ s.name }}')">
+                  <i class="bi bi-terminal"></i> {{ t('scripts.output') }}
+                </button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" class="text-center text-muted py-4">{{ t('scripts.none') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Output Modal -->
+  <div class="modal fade" id="outputModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ t('scripts.output') }} - <span id="outputTitle"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <pre id="outputContent" class="code-box text-white" style="height: 400px; font-size: 0.9rem;"></pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('edit.view') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    .animate-pulse {
+      animation: pulse 1.5s infinite;
+    }
+  </style>
+
+  <script>
+    function viewOutput(name) {
+        const titleEl = document.getElementById('outputTitle');
+        const contentEl = document.getElementById('outputContent');
+        const modalEl = document.getElementById('outputModal');
+        
+        titleEl.innerText = name;
+        contentEl.innerText = 'Loading...';
+        
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+        
+        // Use relative path to avoid hardcoded prefix if app is deployed under prefix
+        fetch(`scripts/output/${name}`)
+            .then(r => r.json())
+            .then(data => {
+                let content = '';
+                if (data.status) content += `Status: ${data.status}\n`;
+                if (data.returncode !== null) content += `Return Code: ${data.returncode}\n`;
+                if (data.start_time) content += `Start: ${data.start_time}\n`;
+                if (data.end_time) content += `End: ${data.end_time}\n`;
+                content += '-'.repeat(40) + '\n';
+                content += (data.stdout || '') + (data.stderr || '');
+                if (!data.stdout && !data.stderr) content += '(No output)';
+                contentEl.innerText = content;
+            })
+            .catch(e => {
+                console.error(e);
+                contentEl.innerText = 'Error loading output or no output available.';
+            });
+    }
+  </script>
 {% endblock %}

@@ -2,24 +2,36 @@
 {% block content %}
   <h5 class="mb-2">Сеть</h5>
   <div class="row g-3">
-    <div class="col-12 col-lg-6">
+    <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">Интерфейсы</h6>
-          {% for name, addrs in ifaces.items() %}
-            <div class="mb-2">
-              <div class="fw-semibold">{{ name }}</div>
-              <ul class="small mb-0">
-                {% for a in addrs %}
-                  <li class="monospace">{{ a.family }} {{ a.address }} {{ a.netmask or '' }}</li>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Интерфейс</th>
+                  <th>Тип</th>
+                  <th>Адрес</th>
+                  <th>Маска</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in ifaces %}
+                <tr>
+                  <td class="fw-semibold">{{ item.interface }}</td>
+                  <td>{{ item.family }}</td>
+                  <td class="monospace">{{ item.address }}</td>
+                  <td class="monospace">{{ item.netmask }}</td>
+                </tr>
                 {% endfor %}
-              </ul>
-            </div>
-          {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-12 col-lg-6">
+    <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">Ping</h6>

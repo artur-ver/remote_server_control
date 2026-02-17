@@ -1,0 +1,17 @@
+.navbar {
+  background: linear-gradient(180deg, #0a1530, #0b1220);
+}
+
+.navbar-brand {
+  letter-spacing: .5px;
+}
+
+.main-container {
+  padding-top: .5rem;
+}
+
+@media (max-width: 576px) {
+  .actions-col {
+    min-width: 180px;
+  }
+}

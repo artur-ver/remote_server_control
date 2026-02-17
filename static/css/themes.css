@@ -1,0 +1,80 @@
+:root {
+  --rsc-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Dark Blue Theme (Default) */
+[data-bs-theme="dark"][data-rsc-theme="dark-blue"] {
+  --bs-primary: #0a2a6a;
+  --bs-primary-rgb: 10, 42, 106;
+  --bs-body-bg: #0b1220;
+  --bs-body-color: #e6e9ef;
+  --bs-tertiary-bg: #0f1829;
+  --bs-secondary-color: #a7b1c2;
+  --bs-border-color: #1f2a3d;
+}
+
+/* Dark Amber Theme */
+[data-bs-theme="dark"][data-rsc-theme="dark-amber"] {
+  --bs-primary: #ff8f00;
+  --bs-primary-rgb: 255, 143, 0;
+  --bs-body-bg: #0f0b00;
+  --bs-body-color: #f0e7d8;
+  --bs-tertiary-bg: #1a1400;
+  --bs-secondary-color: #ceb991;
+  --bs-border-color: #2a2103;
+}
+
+/* Light Theme */
+[data-bs-theme="light"][data-rsc-theme="light"] {
+  --bs-primary: #0d6efd;
+  --bs-primary-rgb: 13, 110, 253;
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #1f2328;
+  --bs-tertiary-bg: #f5f6f8;
+  --bs-secondary-color: #6c757d;
+  --bs-border-color: #dee2e6;
+}
+
+/* High Contrast Theme */
+[data-bs-theme="dark"][data-rsc-theme="high-contrast"] {
+  --bs-primary: #00e5ff;
+  --bs-primary-rgb: 0, 229, 255;
+  --bs-body-bg: #000000;
+  --bs-body-color: #f5f5f5;
+  --bs-tertiary-bg: #0a0a0a;
+  --bs-secondary-color: #c0c0c0;
+  --bs-border-color: #2f2f2f;
+}
+
+/* Terminal Theme */
+[data-bs-theme="dark"][data-rsc-theme="terminal"] {
+  --bs-primary: #00ff88;
+  --bs-primary-rgb: 0, 255, 136;
+  --bs-body-bg: #0a0f0a;
+  --bs-body-color: #c8facc;
+  --bs-tertiary-bg: #071407;
+  --bs-secondary-color: #9ad3a1;
+  --bs-border-color: #123a18;
+}
+
+/* Matrix Theme */
+[data-bs-theme="dark"][data-rsc-theme="matrix"] {
+  --bs-primary: #00ff41;
+  --bs-primary-rgb: 0, 255, 65;
+  --bs-body-bg: #0d0208;
+  --bs-body-color: #008f11;
+  --bs-tertiary-bg: #003b00;
+  --bs-secondary-color: #005f00;
+  --bs-border-color: #003300;
+}
+
+/* Cyberpunk Theme */
+[data-bs-theme="dark"][data-rsc-theme="cyberpunk"] {
+  --bs-primary: #fcee0a;
+  --bs-primary-rgb: 252, 238, 10;
+  --bs-body-bg: #000b1e;
+  --bs-body-color: #00f0ff;
+  --bs-tertiary-bg: #120024;
+  --bs-secondary-color: #ff003c;
+  --bs-border-color: #05d9e8;
+}
