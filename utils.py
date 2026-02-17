@@ -1,6 +1,7 @@
 import os
 import subprocess
 import psutil
+import socket
 from flask import abort
 
 def safe_join(base, *paths):
@@ -9,6 +10,18 @@ def safe_join(base, *paths):
     if os.path.commonpath([candidate, base_abs]) != base_abs:
         abort(403)
     return candidate
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 def is_text_file(path, read_bytes=1024):
     try:
@@ -91,6 +104,8 @@ def get_gpu_info():
     return gpus
 
 def parse_sc_query():
+    if os.name == 'posix':
+        return parse_systemctl()
     try:
         proc = subprocess.run(["sc", "query", "state=", "all"], capture_output=True, text=True, encoding="cp866", errors="replace")
         lines = proc.stdout.splitlines()
@@ -112,7 +127,30 @@ def parse_sc_query():
     except Exception:
         return []
 
+def parse_systemctl():
+    items = []
+    try:
+        proc = subprocess.run(["systemctl", "list-units", "--type=service", "--all", "--no-pager", "--no-legend"], capture_output=True, text=True)
+        if proc.returncode == 0:
+            for line in proc.stdout.splitlines():
+                parts = line.split()
+                if len(parts) >= 4:
+                    name = parts[0]
+                    state = parts[3] # active/inactive
+                    sub = parts[4] # running/dead
+                    desc = " ".join(parts[5:])
+                    items.append({
+                        "service_name": name,
+                        "display_name": desc,
+                        "state": f"{state} ({sub})"
+                    })
+    except Exception:
+        pass
+    return items
+
 def schtasks_list():
+    if os.name == 'posix':
+        return cron_list()
     tasks = []
     try:
         res = subprocess.run(["schtasks", "/Query", "/FO", "CSV"], capture_output=True, text=True, encoding="cp866", errors="replace")
@@ -121,6 +159,29 @@ def schtasks_list():
             reader = csv.DictReader(io.StringIO(res.stdout))
             for row in reader:
                 tasks.append({"name": row.get("TaskName"), "status": row.get("Status"), "next_run": row.get("Next Run Time")})
+    except Exception:
+        pass
+    return tasks
+
+def cron_list():
+    tasks = []
+    try:
+        # User cron
+        proc = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+        if proc.returncode == 0:
+            for line in proc.stdout.splitlines():
+                if line.strip() and not line.strip().startswith("#"):
+                    tasks.append({"name": "User Cron", "status": "Active", "next_run": line.strip()})
+        
+        # System timers
+        proc2 = subprocess.run(["systemctl", "list-timers", "--all", "--no-pager", "--no-legend"], capture_output=True, text=True)
+        if proc2.returncode == 0:
+            for line in proc2.stdout.splitlines():
+                parts = line.split()
+                if len(parts) >= 6:
+                    next_run = f"{parts[0]} {parts[1]}"
+                    unit = parts[-1]
+                    tasks.append({"name": unit, "status": "Active", "next_run": next_run})
     except Exception:
         pass
     return tasks

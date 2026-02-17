@@ -1,13 +1,14 @@
 import os
 import sys
 
-# Ensure dependencies are found
-site_packages = r"C:\Users\artur\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages"
-if site_packages not in sys.path:
-    sys.path.append(site_packages)
+# Ensure site-packages is in path (Windows-specific fix for Store Python)
+if os.name == 'nt':
+    site_packages = r"C:\Users\artur\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages"
+    if os.path.exists(site_packages) and site_packages not in sys.path:
+        sys.path.append(site_packages)
 
-from flask import Flask
-from utils import bytes_human
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
+from utils import bytes_human, get_local_ip
 from i18n import inject_i18n
 
 # Import routes
@@ -22,9 +23,15 @@ def create_app():
 
     app.config["BASE_DIR"] = os.path.abspath(base_dir)
     app.config["SCRIPTS_DIR"] = os.path.abspath(scripts_dir)
+    app.config["LOCAL_IP"] = get_local_ip()
 
     # Context processors
     app.context_processor(inject_i18n)
+    
+    @app.context_processor
+    def inject_network_info():
+        protocol = "https" if "ssl" in sys.argv else "http"
+        return dict(local_ip=app.config["LOCAL_IP"], port=int(os.environ.get("PORT", "5000")), protocol=protocol)
     
     # Filters
     app.add_template_filter(bytes_human, "bytes_human")
@@ -80,4 +87,20 @@ if __name__ == "__main__":
     app = create_app()
     port = int(os.environ.get("PORT", "5000"))
     debug_flag = os.environ.get("FLASK_DEBUG", "1") == "1"
-    app.run(host="0.0.0.0", port=port, debug=debug_flag, use_reloader=debug_flag)
+    
+    local_ip = app.config["LOCAL_IP"]
+    print(f"\n{'='*50}")
+    print(f" RSC Server Starting...")
+    print(f" Local Access:   http://127.0.0.1:{port}")
+    print(f" Network Access: http://{local_ip}:{port}")
+    print(f"{'='*50}\n")
+    
+    # Check if user wants to run with adhoc SSL (simple argument check)
+    if "ssl" in sys.argv:
+        print(" * Running with SSL (HTTPS) enabled.")
+        print(" * Note: You will see a security warning in the browser because the certificate is self-signed.")
+        print(f" * Secure Local Access:   https://127.0.0.1:{port}")
+        print(f" * Secure Network Access: https://{local_ip}:{port}")
+        app.run(host="0.0.0.0", port=port, debug=debug_flag, use_reloader=debug_flag, ssl_context='adhoc')
+    else:
+        app.run(host="0.0.0.0", port=port, debug=debug_flag, use_reloader=debug_flag)
