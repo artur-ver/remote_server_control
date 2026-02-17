@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Процессы</h5>
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-sm align-middle">
+      <thead>
+        <tr>
+          <th>PID</th><th>Имя</th><th>Пользователь</th><th>CPU %</th><th>Память</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in processes %}
+        <tr>
+          <td class="monospace">{{ p.pid }}</td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.user or '-' }}</td>
+          <td>{{ p.cpu or 0 }}</td>
+          <td>{{ p.mem|bytes_human }}</td>
+          <td class="text-end">
+            <form method="post" action="{{ url_for('processes_kill') }}" onsubmit="return confirm('Завершить процесс {{ p.pid }}?')">
+              <input type="hidden" name="pid" value="{{ p.pid }}">
+              <button class="btn btn-sm btn-outline-danger">Kill</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

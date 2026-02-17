@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Система</h5>
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      <div class="card"><div class="card-body">
+        <div><span class="text-muted">Хост:</span> <span class="monospace">{{ info.hostname }}</span></div>
+        <div><span class="text-muted">OS:</span> {{ info.os }}</div>
+        <div><span class="text-muted">Python:</span> {{ info.python }}</div>
+        <div><span class="text-muted">Пользователь:</span> {{ info.user }}</div>
+        <div><span class="text-muted">Загрузка системы:</span> <span class="monospace">{{ info.boot_time | int }}</span></div>
+      </div></div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card"><div class="card-body">
+        <div><span class="text-muted">CPU (логич./физ.):</span> {{ info.cpu_count }} / {{ info.cpu_count_phys }}</div>
+        <div><span class="text-muted">Память всего:</span> {{ info.mem.total | bytes_human }}</div>
+        <div><span class="text-muted">Память занято:</span> {{ info.mem.used | bytes_human }} ({{ info.mem.percent }}%)</div>
+        <div><span class="text-muted">Память доступно:</span> {{ info.mem.available | bytes_human }}</div>
+      </div></div>
+    </div>
+  </div>
+{% endblock %}

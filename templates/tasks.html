@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Планировщик задач</h5>
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-sm align-middle">
+      <thead><tr><th>Имя</th><th>Статус</th><th>Следующий запуск</th><th></th></tr></thead>
+      <tbody>
+        {% for t in tasks %}
+        <tr>
+          <td class="monospace">{{ t.name }}</td>
+          <td>{{ t.status }}</td>
+          <td>{{ t.next_run }}</td>
+          <td class="text-end">
+            <form method="post" action="{{ url_for('tasks') }}">
+              <input type="hidden" name="name" value="{{ t.name }}">
+              <button class="btn btn-sm btn-outline-primary">Запустить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

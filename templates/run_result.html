@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="d-flex align-items-center justify-content-between">
+    <h5 class="mb-0">{{ t('scripts.result') }}: {{ script }}</h5>
+    <span class="text-muted">{{ t('scripts.code') }}: {{ code }}</span>
+  </div>
+  <hr>
+  <a class="btn btn-sm btn-outline-secondary btn-icon mb-2" href="{{ url_for('scripts') }}"><i class="bi bi-arrow-left"></i> {{ t('nav.scripts') }}</a>
+  <div class="code-box"><pre class="monospace mb-0">{{ output }}</pre></div>
+{% endblock %}

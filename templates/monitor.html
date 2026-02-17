@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="d-flex align-items-center justify-content-between">
+    <h5 class="mb-0">{{ t('monitor.title') }}</h5>
+    <span class="text-muted monospace">~1s</span>
+  </div>
+  <hr>
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ t('monitor.cpu') }}</h6>
+          <div class="small text-muted mb-2">Freq: <span id="cpuFreq">-</span>, Cores: <span id="cpuCores">-</span>, Threads: <span id="cpuThreads">-</span></div>
+          <canvas id="cpuChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ t('monitor.mem') }}</h6>
+          <div class="small text-muted mb-2">Used: <span id="memUsed">-</span> / <span id="memTotal">-</span></div>
+          <canvas id="memChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ t('monitor.net') }}</h6>
+          <div class="small text-muted mb-2">Total: ↑ <span id="netUpTotal">-</span> / ↓ <span id="netDownTotal">-</span></div>
+          <canvas id="netChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ t('monitor.disk') }}</h6>
+          <div class="small text-muted mb-2">Used: <span id="diskUsed">-</span> / <span id="diskTotal">-</span> (<span id="diskPercent">-</span>%)</div>
+          <canvas id="diskChart" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ t('monitor.gpu') }}</h6>
+          <div id="gpuContainer" class="row g-3"></div>
+          <canvas id="gpuChart" height="160" class="mt-3"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    const maxPoints = 60;
+    const ctxCpu = document.getElementById('cpuChart').getContext('2d');
+    const ctxMem = document.getElementById('memChart').getContext('2d');
+    const ctxNet = document.getElementById('netChart').getContext('2d');
+    const ctxDisk = document.getElementById('diskChart').getContext('2d');
+    const ctxGpu = document.getElementById('gpuChart').getContext('2d');
+    const commonOpts = { responsive: true, animation: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: true } }, spanGaps: true };
+    const cpuChart = new Chart(ctxCpu, { type: 'line', data: { labels: [], datasets: [{ label: 'CPU %', data: [], borderColor: '#3ea6ff' }] }, options: commonOpts });
+    const memChart = new Chart(ctxMem, { type: 'line', data: { labels: [], datasets: [{ label: 'Memory %', data: [], borderColor: '#6dd5b0' }] }, options: commonOpts });
+    const netChart = new Chart(ctxNet, { type: 'line', data: { labels: [], datasets: [{ label: 'Up', data: [], borderColor: '#ffb74d' }, { label: 'Down', data: [], borderColor: '#ff6e6e' }] }, options: commonOpts });
+    const diskChart = new Chart(ctxDisk, { type: 'line', data: { labels: [], datasets: [{ label: 'Read', data: [], borderColor: '#8e99f3' }, { label: 'Write', data: [], borderColor: '#b388ff' }] }, options: commonOpts });
+    const gpuChart = new Chart(ctxGpu, { type: 'line', data: { labels: [], datasets: [] }, options: commonOpts });
+    let prev = null;
+    function fmtBytes(v) {
+      if (!v && v !== 0) return '-';
+      const units = ['B','KB','MB','GB','TB','PB'];
+      let i = 0; let n = Number(v);
+      while (n >= 1024 && i < units.length-1) { n /= 1024; i++; }
+      return (i === 0 ? Math.round(n) : n.toFixed(1)) + ' ' + units[i];
+    }
+    async function tick() {
+      try {
+        const res = await fetch('{{ url_for("metrics") }}');
+        const m = await res.json();
+        const ts = new Date(m.ts * 1000).toLocaleTimeString();
+        if (prev) {
+          const dt = Math.max(0.001, m.ts - prev.ts);
+          const up = (m.net_bytes_sent - prev.net_bytes_sent) * 8 / 1000 / dt;
+          const down = (m.net_bytes_recv - prev.net_bytes_recv) * 8 / 1000 / dt;
+          const r = (m.disk_read_bytes - prev.disk_read_bytes) * 8 / 1000 / dt;
+          const w = (m.disk_write_bytes - prev.disk_write_bytes) * 8 / 1000 / dt;
+          appendPoint(netChart, ts, [up, down]);
+          appendPoint(diskChart, ts, [r, w]);
+        } else {
+          appendPoint(netChart, ts, [0, 0]);
+          appendPoint(diskChart, ts, [0, 0]);
+        }
+        appendPoint(cpuChart, ts, [m.cpu_percent]);
+        appendPoint(memChart, ts, [m.mem_percent]);
+        document.getElementById('cpuFreq').textContent = (m.cpu_freq_cur ? (m.cpu_freq_cur + ' MHz') : '-') + (m.cpu_freq_max ? (' / ' + m.cpu_freq_max + ' MHz') : '');
+        document.getElementById('cpuCores').textContent = m.cpu_cores ?? '-';
+        document.getElementById('cpuThreads').textContent = m.cpu_threads ?? '-';
+        document.getElementById('memUsed').textContent = fmtBytes(m.mem_used);
+        document.getElementById('memTotal').textContent = fmtBytes(m.mem_total);
+        document.getElementById('diskUsed').textContent = fmtBytes(m.disk_used);
+        document.getElementById('diskTotal').textContent = fmtBytes(m.disk_total);
+        document.getElementById('diskPercent').textContent = m.disk_percent?.toFixed ? m.disk_percent.toFixed(1) : m.disk_percent;
+        document.getElementById('netUpTotal').textContent = fmtBytes(m.net_bytes_sent);
+        document.getElementById('netDownTotal').textContent = fmtBytes(m.net_bytes_recv);
+        // GPU
+        const gpus = m.gpus || [];
+        if (gpuChart.data.datasets.length === 0 && gpus.length > 0) {
+          gpuChart.data.datasets = gpus.map((g, idx) => ({ label: (g.name || ('GPU ' + g.index)) + ' %', data: [], borderColor: ['#4dd0e1','#ff8a65','#9575cd','#4db6ac','#ba68c8'][idx % 5] }));
+        }
+        if (gpus.length > 0) {
+          appendPoint(gpuChart, ts, gpus.map(g => g.util_percent ?? 0));
+          // Render cards
+          const cont = document.getElementById('gpuContainer');
+          if (cont) {
+            cont.innerHTML = '';
+            gpus.forEach((g, idx) => {
+              const div = document.createElement('div');
+              div.className = 'col-12 col-md-6 col-xl-4';
+              div.innerHTML = `
+                <div class="p-3 border rounded-3" style="border-color: var(--bs-border-color); background: var(--bs-tertiary-bg);">
+                  <div class="d-flex justify-content-between">
+                    <div class="fw-semibold">${g.name || 'GPU ' + g.index}</div>
+                    <div class="text-muted">#${g.index}</div>
+                  </div>
+                  <div class="small text-muted">Util: ${g.util_percent ?? 0}%</div>
+                  <div class="small text-muted">Mem: ${fmtBytes(g.mem_used || 0)} / ${fmtBytes(g.mem_total || 0)}</div>
+                </div>`;
+              cont.appendChild(div);
+            });
+          }
+        }
+        prev = m;
+      } catch (e) {}
+    }
+    function appendPoint(chart, label, values) {
+      chart.data.labels.push(label);
+      while (chart.data.labels.length > maxPoints) chart.data.labels.shift();
+      chart.data.datasets.forEach((ds, i) => {
+        ds.data.push(values[i] ?? 0);
+        while (ds.data.length > maxPoints) ds.data.shift();
+      });
+      chart.update();
+    }
+    setInterval(tick, 1000);
+    tick();
+  </script>
+{% endblock %}

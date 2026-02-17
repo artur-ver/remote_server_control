@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Сеть</h5>
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Интерфейсы</h6>
+          {% for name, addrs in ifaces.items() %}
+            <div class="mb-2">
+              <div class="fw-semibold">{{ name }}</div>
+              <ul class="small mb-0">
+                {% for a in addrs %}
+                  <li class="monospace">{{ a.family }} {{ a.address }} {{ a.netmask or '' }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Ping</h6>
+          <form method="post" class="mb-2">
+            <div class="input-group">
+              <input type="text" name="host" class="form-control" placeholder="example.com" value="{{ ping_host or '' }}" required>
+              <button class="btn btn-primary">Ping</button>
+            </div>
+          </form>
+          {% if ping_out is not none %}
+            <pre class="code-box monospace">{{ ping_out }}</pre>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

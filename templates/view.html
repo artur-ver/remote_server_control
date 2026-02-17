@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="d-flex align-items-center justify-content-between">
+    <h5 class="mb-0">{{ t('table.name') }}: {{ rel_path }}</h5>
+    <div class="d-flex gap-2">
+      <a class="btn btn-sm btn-outline-secondary btn-icon" href="{{ url_for('download_file', path=rel_path) }}"><i class="bi bi-download"></i> {{ t('view.download') }}</a>
+      <a class="btn btn-sm btn-outline-primary btn-icon" href="{{ url_for('browse', path=rel_path|replace('\\' , '/')|rsplit('/', 1)[0]) }}"><i class="bi bi-arrow-left"></i> {{ t('view.back') }}</a>
+    </div>
+  </div>
+  <hr>
+  {% if is_text %}
+    <div class="code-toolbar">
+      <button id="copyBtn" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-clipboard"></i> {{ t('ui.copy') }}</button>
+      <button id="wrapBtn" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-text-wrap"></i> {{ t('ui.wrap') }}</button>
+    </div>
+    <pre id="codeText" class="monospace code-box">{{ text_content }}</pre>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      ;(function() {
+        try {
+          const el = document.getElementById('codeText')
+          if (el) { hljs.highlightElement(el) }
+        } catch (e) {}
+      })()
+    </script>
+  {% else %}
+    <div class="alert alert-info">{{ t('view.not_text') }}</div>
+  {% endif %}
+{% endblock %}

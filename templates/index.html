@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="py-2">
+    <h4 class="mb-1">{{ t('nav.home') }}</h4>
+    <p class="text-muted mb-3">Remote Server Control</p>
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <div class="card h-100 text-bg-primary-subtle border-0">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-folder2-open me-1"></i> {{ t('nav.files') }}</h5>
+            <p class="card-text">Browse, upload, download, edit.</p>
+            <a href="{{ url_for('browse') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card h-100 text-bg-primary-subtle border-0">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-terminal me-1"></i> {{ t('nav.terminal') }}</h5>
+            <p class="card-text">Non-interactive command execution.</p>
+            <a href="{{ url_for('terminal') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card h-100 text-bg-primary-subtle border-0">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-play-fill me-1"></i> {{ t('nav.scripts') }}</h5>
+            <p class="card-text">Run .py and .bat from scripts folder.</p>
+            <a href="{{ url_for('scripts') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card h-100 text-bg-primary-subtle border-0">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-activity me-1"></i> {{ t('nav.monitor') }}</h5>
+            <p class="card-text">CPU, Memory, Disk, Network, GPU charts.</p>
+            <a href="{{ url_for('monitor') }}" class="btn btn-primary btn-icon"><i class="bi bi-box-arrow-in-right"></i> {{ t('action.open') }}</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-8">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-tools me-1"></i> Инструменты</h5>
+            <div class="row g-2">
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('processes') }}">Процессы</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('services') }}">Сервисы</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('ports') }}">Порты</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('network') }}">Сеть</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('disks') }}">Диски</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('system_info') }}">Система</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('tasks') }}">Планировщик</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('logs') }}">Логи</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-primary" href="{{ url_for('backup') }}">Бэкап</a></div>
+              <div class="col-6 col-lg-4"><a class="btn w-100 btn-outline-danger" href="{{ url_for('power') }}">Питание</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

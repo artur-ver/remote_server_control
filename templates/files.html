@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('browse') }}">{{ t('breadcrumb.root') }}</a></li>
+        {% if current_rel %}
+          {% set parts = current_rel.split('\\') if '\\' in current_rel else current_rel.split('/') %}
+          {% set accum = [] %}
+          {% for p in parts %}
+            {% set _ = accum.append(p) %}
+            <li class="breadcrumb-item {% if loop.last %}active{% endif %}" {% if loop.last %}aria-current="page"{% endif %}>
+              {% if loop.last %}
+                {{ p }}
+              {% else %}
+                <a href="{{ url_for('browse', path='/'.join(accum)) }}">{{ p }}</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ol>
+    </nav>
+    <input id="filesFilter" class="form-control form-control-sm search-input" placeholder="Фильтр по имени">
+  </div>
+  <form class="mb-3" method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md">
+        <label class="form-label">{{ t('files.upload.label') }}</label>
+        <input type="file" class="form-control" name="file" required>
+        <input type="hidden" name="path" value="{{ current_rel }}">
+      </div>
+      <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-primary btn-icon"><i class="bi bi-upload"></i> {{ t('files.upload.button') }}</button>
+      </div>
+    </div>
+  </form>
+  <div class="table-responsive">
+    <table id="filesTable" class="table table-dark table-striped table-hover table-sm align-middle">
+      <thead>
+        <tr>
+          <th>{{ t('table.name') }}</th>
+          <th>{{ t('table.type') }}</th>
+          <th>{{ t('table.size') }}</th>
+          <th>{{ t('table.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for item in items %}
+        <tr data-name="{{ item.name|lower }}">
+          <td class="monospace">
+            {% if item.is_dir %}
+              <span class="file-icon"><i class="bi bi-folder-fill text-warning"></i></span>
+              <a href="{{ url_for('browse', path=item.rel_path) }}">{{ item.name }}</a>
+            {% else %}
+              <span class="file-icon"><i class="bi bi-file-earmark-text"></i></span>
+              <a href="{{ url_for('view_file', path=item.rel_path) }}">{{ item.name }}</a>
+            {% endif %}
+          </td>
+          <td>{{ t('type.dir') if item.is_dir else (item.ext[1:] if item.ext else t('type.file')) }}</td>
+          <td>{{ item.size|bytes_human if item.size is not none else "-" }}</td>
+          <td>
+            {% if item.is_dir %}
+              <a class="btn btn-sm btn-outline-primary btn-icon" href="{{ url_for('browse', path=item.rel_path) }}"><i class="bi bi-folder2-open"></i> {{ t('action.open') }}</a>
+            {% else %}
+              <a class="btn btn-sm btn-outline-primary btn-icon" href="{{ url_for('view_file', path=item.rel_path) }}"><i class="bi bi-eye"></i> {{ t('action.view') }}</a>
+              <a class="btn btn-sm btn-outline-secondary btn-icon" href="{{ url_for('download_file', path=item.rel_path) }}"><i class="bi bi-download"></i> {{ t('action.download') }}</a>
+              {% set text_exts = ['.txt','.md','.py','.js','.ts','.tsx','.json','.yml','.yaml','.ini','.cfg','.bat','.ps1','.log','.csv','.html','.css','.xml','.sh'] %}
+              {% if item.ext in text_exts %}
+                <a class="btn btn-sm btn-outline-success btn-icon" href="{{ url_for('edit_file', path=item.rel_path) }}"><i class="bi bi-pencil-square"></i> {{ t('action.edit') }}</a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

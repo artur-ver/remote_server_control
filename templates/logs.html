@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Логи</h5>
+  <form method="post" class="row g-2 mb-2">
+    <div class="col-12 col-md-8">
+      <select name="path" class="form-select">
+        {% for f in files %}
+          <option value="{{ f }}" {% if f==path %}selected{% endif %}>{{ f }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12 col-md-4">
+      <button class="btn btn-primary">Открыть</button>
+    </div>
+  </form>
+  {% if content is not none %}
+    <div class="code-box"><pre class="monospace mb-0">{{ content }}</pre></div>
+  {% endif %}
+{% endblock %}

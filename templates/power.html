@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Питание</h5>
+  {% if not allowed %}
+    <div class="alert alert-info">Для включения действий установите переменную окружения ALLOW_POWER=1. Пока действия отключены.</div>
+  {% endif %}
+  <div class="d-flex gap-2">
+    <form method="post" onsubmit="return confirm('Инициировать перезагрузку?')">
+      <input type="hidden" name="action" value="reboot">
+      <button class="btn btn-warning" {% if not allowed %}disabled{% endif %}>Перезагрузка</button>
+    </form>
+    <form method="post" onsubmit="return confirm('Инициировать выключение?')">
+      <input type="hidden" name="action" value="shutdown">
+      <button class="btn btn-danger" {% if not allowed %}disabled{% endif %}>Выключение</button>
+    </form>
+  </div>
+{% endblock %}

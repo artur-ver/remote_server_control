@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+  <h5 class="mb-2">Порты</h5>
+  <div class="table-responsive">
+    <table class="table table-dark table-hover table-sm align-middle">
+      <thead><tr><th>Протокол</th><th>Локальный адрес</th><th>Удалённый адрес</th><th>Состояние</th><th>PID</th><th>Процесс</th></tr></thead>
+      <tbody>
+        {% for e in entries %}
+        <tr>
+          <td>{{ e.proto }}</td>
+          <td class="monospace">{{ e.local }}</td>
+          <td class="monospace">{{ e.remote }}</td>
+          <td>{{ e.state }}</td>
+          <td class="monospace">{{ e.pid or '-' }}</td>
+          <td>{{ e.name or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

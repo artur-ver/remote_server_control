@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="d-flex align-items-center justify-content-between">
+    <h5 class="mb-0">{{ t('nav.terminal') }}</h5>
+    <span class="text-muted monospace">{{ base_dir }}</span>
+  </div>
+  <hr>
+  <form method="post" action="{{ url_for('terminal_exec') }}" class="mb-3">
+    <div class="row g-2">
+      <div class="col-12 col-md-6">
+        <label class="form-label">{{ t('term.command') }}</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-chevron-right"></i></span>
+          <input type="text" class="form-control" name="cmd" placeholder="dir" value="{{ last_cmd or '' }}" required>
+          <button class="btn btn-primary btn-icon" type="submit"><i class="bi bi-play-fill"></i> {{ t('term.execute') }}</button>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">{{ t('term.shell') }}</label>
+        <select class="form-select" name="shell">
+          <option value="cmd">cmd</option>
+          <option value="powershell">powershell</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-4">
+        <label class="form-label">{{ t('term.cwd') }}</label>
+        <input type="text" class="form-control monospace" name="cwd" placeholder="" value="">
+      </div>
+    </div>
+  </form>
+  <div class="mb-3">
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="dir">dir</button>
+      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="whoami">whoami</button>
+      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="ipconfig">ipconfig</button>
+      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="systeminfo">systeminfo</button>
+      <button class="btn btn-sm btn-outline-secondary quick-cmd" data-cmd="tasklist">tasklist</button>
+      <form method="post" action="{{ url_for('terminal_clear') }}" class="d-inline">
+        <button class="btn btn-sm btn-outline-warning">{{ t('term.quick.clear') }}</button>
+      </form>
+    </div>
+  </div>
+  {% if history %}
+    <div class="mb-2">
+      <div class="text-muted mb-1">{{ t('term.history') }}:</div>
+      <div class="d-flex flex-wrap gap-2">
+        {% for item in history %}
+          <span class="badge bg-secondary quick-cmd" data-cmd="{{ item }}">{{ item }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+  {% if output is not none %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="text-muted">{{ t('term.return_code') }}: {{ code if code is not none else "-" }}</div>
+      <div class="d-flex gap-2">
+        <button id="copyBtn" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-clipboard"></i> {{ t('ui.copy') }}</button>
+        <button id="wrapBtn" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-text-wrap"></i> {{ t('ui.wrap') }}</button>
+      </div>
+    </div>
+    <div class="code-box"><pre id="codeText" class="monospace mb-0">{{ output }}</pre></div>
+    <script>
+      document.querySelectorAll('.quick-cmd').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const cmd = btn.getAttribute('data-cmd');
+          const input = document.querySelector('input[name="cmd"]');
+          if (input && cmd) input.value = cmd;
+        });
+      });
+    </script>
+  {% else %}
+    <script>
+      document.querySelectorAll('.quick-cmd').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const cmd = btn.getAttribute('data-cmd');
+          const input = document.querySelector('input[name="cmd"]');
+          if (input && cmd) input.value = cmd;
+        });
+      });
+    </script>
+  {% endif %}
+{% endblock %}
