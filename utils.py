@@ -11,6 +11,29 @@ def safe_join(base, *paths):
         abort(403)
     return candidate
 
+def get_all_ips():
+    ips = []
+    try:
+        # Get all network interfaces
+        for interface, addrs in psutil.net_if_addrs().items():
+            for addr in addrs:
+                if addr.family == socket.AF_INET and not addr.address.startswith("127."):
+                    if not addr.address.startswith("169.254."):
+                        ips.append(addr.address)
+    except Exception:
+        pass
+        
+    # Fallback if psutil fails or returns nothing
+    if not ips:
+        try:
+            ip = get_local_ip()
+            if ip != "127.0.0.1":
+                ips.append(ip)
+        except:
+            pass
+            
+    return sorted(list(set(ips)))
+
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:

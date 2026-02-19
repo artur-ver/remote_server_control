@@ -118,7 +118,7 @@
       const cmdHtml = `
         <div class="mb-2">
           <div class="text-secondary prompt">
-            <span class="text-success user">root@rsc</span>:<span class="text-primary path">${cwdBadge.innerText}</span>$ <span class="text-light">${cmd}</span>
+            <span class="text-success user">{{ t('term.prompt_user') }}@{{ t('term.prompt_host') }}</span>:<span class="text-primary path">${cwdBadge.innerText}</span>$ <span class="text-light">${cmd}</span>
           </div>
           <div class="text-light pre-wrap ms-2 border-start border-secondary ps-2 loading-indicator">...</div>
         </div>
@@ -157,7 +157,7 @@
           if (data.code !== 0) {
               const errDiv = document.createElement('div');
               errDiv.className = 'text-danger ms-2';
-              errDiv.innerText = `Exit code: ${data.code}`;
+              errDiv.innerText = `{{ t('term.exit_code') }}: ${data.code}`;
               tempDiv.appendChild(errDiv);
           }
           
@@ -170,7 +170,7 @@
 
       } catch (err) {
           console.error(err);
-          const errHtml = `<div class="text-danger ms-2">Communication error: ${err.message}</div>`;
+          const errHtml = `<div class="text-danger ms-2">{{ t('term.comm_error') }}: ${err.message}</div>`;
           tempDiv.insertAdjacentHTML('beforeend', errHtml);
       }
   });

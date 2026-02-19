@@ -149,7 +149,7 @@
         const modalEl = document.getElementById('outputModal');
         
         titleEl.innerText = name;
-        contentEl.innerText = 'Loading...';
+        contentEl.innerText = '{{ t("js.loading") }}';
         
         const modal = new bootstrap.Modal(modalEl);
         modal.show();
@@ -165,12 +165,12 @@
                 if (data.end_time) content += `End: ${data.end_time}\n`;
                 content += '-'.repeat(40) + '\n';
                 content += (data.stdout || '') + (data.stderr || '');
-                if (!data.stdout && !data.stderr) content += '(No output)';
+                if (!data.stdout && !data.stderr) content += '{{ t("js.no_output") }}';
                 contentEl.innerText = content;
             })
             .catch(e => {
                 console.error(e);
-                contentEl.innerText = 'Error loading output or no output available.';
+                contentEl.innerText = '{{ t("js.error_loading") }}';
             });
     }
   </script>

@@ -20,7 +20,12 @@
         {% endif %}
       </ol>
     </nav>
-    <input id="filesFilter" class="form-control form-control-sm search-input" placeholder="{{ t('files.filter_placeholder') }}">
+    <div class="d-flex align-items-center gap-2">
+      <a href="{{ url_for('trash_list') }}" class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-trash"></i> {{ t('nav.trash') }}
+      </a>
+      <input id="filesFilter" class="form-control form-control-sm search-input" placeholder="{{ t('files.filter_placeholder') }}">
+    </div>
   </div>
   <form class="mb-3" method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
     <div class="row g-2 align-items-end">
@@ -69,6 +74,7 @@
                 <a class="btn btn-sm btn-outline-success btn-icon" href="{{ url_for('edit_file', path=item.rel_path) }}"><i class="bi bi-pencil-square"></i> {{ t('action.edit') }}</a>
               {% endif %}
             {% endif %}
+            <a href="{{ url_for('trash_add', path=item.rel_path) }}" class="btn btn-sm btn-outline-danger btn-icon ms-1" title="{{ t('trash.title') }}"><i class="bi bi-trash"></i></a>
           </td>
         </tr>
       {% endfor %}

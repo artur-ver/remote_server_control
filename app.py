@@ -8,7 +8,7 @@ if os.name == 'nt':
         sys.path.append(site_packages)
 
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
-from utils import bytes_human, get_local_ip
+from utils import bytes_human, get_local_ip, get_all_ips
 from i18n import inject_i18n
 
 # Import routes
@@ -46,6 +46,13 @@ def create_app():
     app.add_url_rule("/edit", "edit_file", files.edit_file, methods=["GET", "POST"])
     app.add_url_rule("/download", "download_file", files.download_file)
     app.add_url_rule("/backup", "backup", files.backup, methods=["GET", "POST"])
+    
+    # Trash routes
+    app.add_url_rule("/files/trash", "trash_list", files.trash_list)
+    app.add_url_rule("/files/trash/add", "trash_add", files.trash_add)
+    app.add_url_rule("/files/trash/restore", "trash_restore", files.trash_restore, methods=["POST"])
+    app.add_url_rule("/files/trash/delete", "trash_delete", files.trash_delete, methods=["POST"])
+    app.add_url_rule("/files/trash/empty", "trash_empty", files.trash_empty, methods=["POST"])
     
     app.add_url_rule("/terminal", "terminal", terminal.terminal, methods=["GET"])
     app.add_url_rule("/terminal/exec", "terminal_exec", terminal.terminal_exec, methods=["POST"])
@@ -89,18 +96,29 @@ if __name__ == "__main__":
     debug_flag = os.environ.get("FLASK_DEBUG", "1") == "1"
     
     local_ip = app.config["LOCAL_IP"]
-    print(f"\n{'='*50}")
-    print(f" RSC Server Starting...")
-    print(f" Local Access:   http://127.0.0.1:{port}")
-    print(f" Network Access: http://{local_ip}:{port}")
-    print(f"{'='*50}\n")
+    all_ips = get_all_ips()
     
     # Check if user wants to run with adhoc SSL (simple argument check)
     if "ssl" in sys.argv:
-        print(" * Running with SSL (HTTPS) enabled.")
+        print(f"\n{'='*50}")
+        print(f" RSC Server Starting (HTTPS Mode)...")
         print(" * Note: You will see a security warning in the browser because the certificate is self-signed.")
         print(f" * Secure Local Access:   https://127.0.0.1:{port}")
-        print(f" * Secure Network Access: https://{local_ip}:{port}")
+        if all_ips:
+            for ip in all_ips:
+                print(f" * Secure Network Access: https://{ip}:{port}")
+        else:
+            print(f" * Secure Network Access: https://{local_ip}:{port}")
+        print(f"{'='*50}\n")
         app.run(host="0.0.0.0", port=port, debug=debug_flag, use_reloader=debug_flag, ssl_context='adhoc')
     else:
+        print(f"\n{'='*50}")
+        print(f" RSC Server Starting (HTTP Mode)...")
+        print(f" Local Access:   http://127.0.0.1:{port}")
+        if all_ips:
+            for ip in all_ips:
+                 print(f" Network Access: http://{ip}:{port}")
+        else:
+            print(f" Network Access: http://{local_ip}:{port}")
+        print(f"{'='*50}\n")
         app.run(host="0.0.0.0", port=port, debug=debug_flag, use_reloader=debug_flag)
