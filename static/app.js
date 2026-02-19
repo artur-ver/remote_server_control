@@ -1,23 +1,64 @@
 ;(() => {
+  const THEMES = [
+    // Essentials
+    { name: 'dark-blue', bs: 'dark', rsc: 'dark-blue' },
+    { name: 'dark-amber', bs: 'dark', rsc: 'dark-amber' },
+    { name: 'light', bs: 'light', rsc: 'light' },
+    { name: 'high-contrast', bs: 'dark', rsc: 'high-contrast' },
+    
+    // Professional
+    { name: 'nord', bs: 'dark', rsc: 'nord' },
+    { name: 'dracula', bs: 'dark', rsc: 'dracula' },
+    { name: 'solarized-dark', bs: 'dark', rsc: 'solarized-dark' },
+    { name: 'gruvbox-dark', bs: 'dark', rsc: 'gruvbox-dark' },
+    { name: 'monokai', bs: 'dark', rsc: 'monokai' },
+
+    // Hacker
+    { name: 'terminal', bs: 'dark', rsc: 'terminal' },
+    { name: 'matrix', bs: 'dark', rsc: 'matrix' },
+
+    // Cyberpunk
+    { name: 'cyberpunk', bs: 'dark', rsc: 'cyberpunk' },
+    { name: 'cyberpunk-red', bs: 'dark', rsc: 'cyberpunk-red' },
+    { name: 'cyberpunk-green', bs: 'dark', rsc: 'cyberpunk-green' },
+    { name: 'cyberpunk-blue', bs: 'dark', rsc: 'cyberpunk-blue' },
+  ]
+
   const applyTheme = (name) => {
-    const map = {
-      'dark-blue': { bs: 'dark', rsc: 'dark-blue' },
-      'dark-amber': { bs: 'dark', rsc: 'dark-amber' },
-      'light': { bs: 'light', rsc: 'light' },
-      'high-contrast': { bs: 'dark', rsc: 'high-contrast' },
-      'terminal': { bs: 'dark', rsc: 'terminal' },
-      'matrix': { bs: 'dark', rsc: 'matrix' },
-      'cyberpunk': { bs: 'dark', rsc: 'cyberpunk' },
-    }
-    const cfg = map[name] || map['dark-blue']
+    const cfg = THEMES.find(t => t.name === name) || THEMES[0]
     document.documentElement.setAttribute('data-bs-theme', cfg.bs)
     document.documentElement.setAttribute('data-rsc-theme', cfg.rsc)
-    try { localStorage.setItem('rsc-theme', name) } catch (_) {}
+    try { localStorage.setItem('rsc-theme', cfg.name) } catch (_) {}
+    
+    // Update active state in dropdown
+    document.querySelectorAll('.theme-option').forEach(el => {
+      if (el.getAttribute('data-theme') === cfg.name) {
+        el.classList.add('active')
+      } else {
+        el.classList.remove('active')
+      }
+    })
   }
+
+  const cycleTheme = (dir) => {
+    const current = document.documentElement.getAttribute('data-rsc-theme') || 'dark-blue'
+    let idx = THEMES.findIndex(t => t.rsc === current)
+    if (idx === -1) idx = 0
+    
+    let nextIdx = idx + dir
+    if (nextIdx >= THEMES.length) nextIdx = 0
+    if (nextIdx < 0) nextIdx = THEMES.length - 1
+    
+    applyTheme(THEMES[nextIdx].name)
+  }
+
+  // Initial load
   try {
     const saved = localStorage.getItem('rsc-theme') || 'dark-blue'
     applyTheme(saved)
   } catch (_) { applyTheme('dark-blue') }
+
+  // Dropdown click handlers
   document.querySelectorAll('.theme-option').forEach(a => {
     a.addEventListener('click', (e) => {
       e.preventDefault()
@@ -25,6 +66,13 @@
       if (name) applyTheme(name)
     })
   })
+
+  // Prev/Next buttons
+  const prevThemeBtn = document.getElementById('prevThemeBtn')
+  const nextThemeBtn = document.getElementById('nextThemeBtn')
+  if (prevThemeBtn) prevThemeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); cycleTheme(-1) })
+  if (nextThemeBtn) nextThemeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); cycleTheme(1) })
+
   const filter = document.getElementById('filesFilter')
   if (filter) {
     filter.addEventListener('input', () => {

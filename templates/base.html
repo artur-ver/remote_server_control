@@ -16,10 +16,82 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top">
       <div class="container-fluid">
         <a class="navbar-brand fw-semibold" href="{{ url_for('index') }}">{{ t('app.brand') }}</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+        
+        <!-- Tools Section: Always visible -->
+        <div class="d-flex ms-auto order-lg-2">
+          <!-- Theme Switcher -->
+          <div class="dropdown me-2">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-light" id="prevThemeBtn" title="Previous Theme">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="d-none d-sm-inline">{{ t('ui.theme') }}</span>
+                  <i class="bi bi-palette d-sm-none"></i>
+                </button>
+                <button type="button" class="btn btn-outline-light" id="nextThemeBtn" title="Next Theme">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="max-height: 80vh; overflow-y: auto;">
+                  <!-- Essentials -->
+                  <li><h6 class="dropdown-header">Essentials</h6></li>
+                  <li><a class="dropdown-item theme-option" data-theme="dark-blue" href="#">{{ t('theme.dark_blue') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="dark-amber" href="#">{{ t('theme.dark_amber') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="light" href="#">{{ t('theme.light') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="high-contrast" href="#">{{ t('theme.high_contrast') }}</a></li>
+                  
+                  <li><hr class="dropdown-divider"></li>
+                  
+                  <!-- Professional -->
+                  <li><h6 class="dropdown-header">Professional</h6></li>
+                  <li><a class="dropdown-item theme-option" data-theme="nord" href="#">{{ t('theme.nord') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="dracula" href="#">{{ t('theme.dracula') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="solarized-dark" href="#">{{ t('theme.solarized_dark') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="gruvbox-dark" href="#">{{ t('theme.gruvbox_dark') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="monokai" href="#">{{ t('theme.monokai') }}</a></li>
+                  
+                  <li><hr class="dropdown-divider"></li>
+                  
+                  <!-- Hacker -->
+                  <li><h6 class="dropdown-header">Hacker</h6></li>
+                  <li><a class="dropdown-item theme-option" data-theme="terminal" href="#">{{ t('theme.terminal') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="matrix" href="#">{{ t('theme.matrix') }}</a></li>
+                  
+                  <li><hr class="dropdown-divider"></li>
+                  
+                  <!-- Cyberpunk -->
+                  <li><h6 class="dropdown-header">Cyberpunk</h6></li>
+                  <li><a class="dropdown-item theme-option" data-theme="cyberpunk" href="#">{{ t('theme.cyberpunk') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="cyberpunk-red" href="#">{{ t('theme.cyberpunk_red') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="cyberpunk-green" href="#">{{ t('theme.cyberpunk_green') }}</a></li>
+                  <li><a class="dropdown-item theme-option" data-theme="cyberpunk-blue" href="#">{{ t('theme.cyberpunk_blue') }}</a></li>
+                </ul>
+            </div>
+          </div>
+          
+          <!-- Language Switcher -->
+          <div class="dropdown me-2">
+            <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ lang|upper }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='en', next=request.full_path) }}">EN</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='cs', next=request.full_path) }}">CS</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='ru', next=request.full_path) }}">RU</a></li>
+            </ul>
+          </div>
+          
+          <!-- Mobile Connect (visible but small) -->
+          <button class="btn btn-sm btn-outline-success d-none d-sm-inline-block" type="button" data-bs-toggle="modal" data-bs-target="#mobileConnectModal" title="{{ t('modal.mobile_connect.title') }}">
+              <i class="bi bi-qr-code"></i>
+          </button>
+        </div>
+
+        <button class="navbar-toggler ms-2 order-lg-3" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navMain">
+        
+        <div class="collapse navbar-collapse order-lg-1" id="navMain">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link {% if request.endpoint=='index' %}active{% endif %}" href="{{ url_for('index') }}">{{ t('nav.home') }}</a></li>
             <li class="nav-item"><a class="nav-link {% if request.endpoint in ['browse','view_file','edit_file'] %}active{% endif %}" href="{{ url_for('browse') }}">{{ t('nav.files') }}</a></li>
@@ -42,36 +114,6 @@
               </ul>
             </li>
           </ul>
-          <div class="d-flex">
-            <div class="dropend me-2">
-              <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ t('ui.theme') }}
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item theme-option" data-theme="dark-blue" href="#">{{ t('theme.dark_blue') }}</a></li>
-                <li><a class="dropdown-item theme-option" data-theme="dark-amber" href="#">{{ t('theme.dark_amber') }}</a></li>
-                <li><a class="dropdown-item theme-option" data-theme="light" href="#">{{ t('theme.light') }}</a></li>
-                <li><a class="dropdown-item theme-option" data-theme="high-contrast" href="#">{{ t('theme.high_contrast') }}</a></li>
-                <li><a class="dropdown-item theme-option" data-theme="terminal" href="#">{{ t('theme.terminal') }}</a></li>
-                <li><a class="dropdown-item theme-option" data-theme="matrix" href="#">{{ t('theme.matrix') }}</a></li>
-                <li><a class="dropdown-item theme-option" data-theme="cyberpunk" href="#">{{ t('theme.cyberpunk') }}</a></li>
-              </ul>
-            </div>
-            <div class="dropend ms-2">
-              <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ lang|upper }}
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='en', next=request.full_path) }}">EN</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='cs', next=request.full_path) }}">CS</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='ru', next=request.full_path) }}">RU</a></li>
-              </ul>
-            </div>
-            
-            <button class="btn btn-sm btn-outline-success ms-2" type="button" data-bs-toggle="modal" data-bs-target="#mobileConnectModal" title="{{ t('modal.mobile_connect.title') }}">
-                <i class="bi bi-qr-code"></i>
-            </button>
-          </div>
         </div>
       </div>
     </nav>
