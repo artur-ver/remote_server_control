@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+  <div class="card shadow-sm" style="max-width: 380px; width: 100%;">
+    <div class="card-body">
+      <h5 class="card-title mb-3 text-center">{{ t('auth.title') }}</h5>
+      <form method="post" action="{{ url_for('login', next=next_url) }}">
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <div class="mb-3">
+          <label class="form-label">{{ t('auth.username') }}</label>
+          <input type="text" class="form-control" name="username" autofocus>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{ t('auth.password') }}</label>
+          <input type="password" class="form-control" name="password">
+        </div>
+        <button class="btn btn-primary w-100" type="submit">{{ t('auth.submit') }}</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

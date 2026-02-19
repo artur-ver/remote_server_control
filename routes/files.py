@@ -154,7 +154,7 @@ def backup():
         try:
             target = safe_join(current_app.config["BASE_DIR"], rel)
         except Exception:
-            flash("Недопустимый путь", "danger")
+            flash(tr("backup.invalid_path"), "danger")
             return redirect(url_for("backup"))
         max_bytes = 100 * 1024 * 1024
         total = 0
@@ -163,7 +163,7 @@ def backup():
             if os.path.isfile(target):
                 total += os.path.getsize(target)
                 if total > max_bytes:
-                    flash("Размер архива превышает лимит 100MB", "danger")
+                    flash(tr("backup.limit_exceeded"), "danger")
                     return redirect(url_for("backup"))
                 zf.write(target, arcname=os.path.basename(target))
             else:
@@ -173,7 +173,7 @@ def backup():
                         try:
                             total += os.path.getsize(fp)
                             if total > max_bytes:
-                                flash("Размер архива превышает лимит 100MB", "danger")
+                                flash(tr("backup.limit_exceeded"), "danger")
                                 return redirect(url_for("backup"))
                             arc = os.path.relpath(fp, os.path.dirname(target))
                             zf.write(fp, arcname=arc)

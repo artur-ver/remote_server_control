@@ -1,5 +1,6 @@
 import psutil
 from flask import render_template, request, flash, redirect, url_for
+from i18n import tr
 
 def processes():
     procs = []
@@ -21,15 +22,15 @@ def processes():
 def processes_kill():
     pid = request.form.get("pid", type=int)
     if not pid:
-        flash("PID не указан", "warning")
+        flash(tr("proc.pid_not_specified"), "warning")
         return redirect(url_for("processes"))
     try:
         psutil.Process(pid).terminate()
-        flash(f"Процесс {pid} завершён", "success")
+        flash(f"{tr('proc.terminated')} {pid}", "success")
     except psutil.NoSuchProcess:
-        flash("Процесс не найден", "warning")
+        flash(tr("proc.not_found"), "warning")
     except psutil.AccessDenied:
-        flash("Нет прав на завершение процесса", "danger")
+        flash(tr("proc.access_denied"), "danger")
     except Exception as e:
-        flash(f"Ошибка: {e}", "danger")
+        flash(f"{tr('msg.error')}: {e}", "danger")
     return redirect(url_for("processes"))

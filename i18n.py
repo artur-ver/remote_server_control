@@ -4,7 +4,7 @@ from languages import SUPPORTED_LANGS, TRANSLATIONS
 def get_lang():
     lang = session.get("lang", None)
     if not lang or lang not in SUPPORTED_LANGS:
-        return "ru"
+        return "en"
     return lang
 
 def tr(key):

@@ -43,11 +43,11 @@
             </li>
           </ul>
           <div class="d-flex">
-            <div class="dropdown me-2">
+            <div class="dropend me-2">
               <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 {{ t('ui.theme') }}
               </button>
-              <ul class="dropdown-menu dropdown-menu-end">
+              <ul class="dropdown-menu">
                 <li><a class="dropdown-item theme-option" data-theme="dark-blue" href="#">{{ t('theme.dark_blue') }}</a></li>
                 <li><a class="dropdown-item theme-option" data-theme="dark-amber" href="#">{{ t('theme.dark_amber') }}</a></li>
                 <li><a class="dropdown-item theme-option" data-theme="light" href="#">{{ t('theme.light') }}</a></li>
@@ -57,11 +57,11 @@
                 <li><a class="dropdown-item theme-option" data-theme="cyberpunk" href="#">{{ t('theme.cyberpunk') }}</a></li>
               </ul>
             </div>
-            <div class="dropdown ms-2">
+            <div class="dropend ms-2">
               <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 {{ lang|upper }}
               </button>
-              <ul class="dropdown-menu dropdown-menu-end">
+              <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='en', next=request.full_path) }}">EN</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='cs', next=request.full_path) }}">CS</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('set_lang', lang='ru', next=request.full_path) }}">RU</a></li>

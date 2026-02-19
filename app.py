@@ -9,10 +9,11 @@ if os.name == 'nt':
 
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
 from utils import bytes_human, get_local_ip, get_all_ips
-from i18n import inject_i18n
+from i18n import inject_i18n, tr
 
 # Import routes
 from routes import main, files, terminal, monitor, processes, services, ports, network, disks, system, tasks, logs, power, scripts
+from routes import auth
 
 def create_app():
     app = Flask(__name__)
@@ -39,6 +40,22 @@ def create_app():
     # Routes
     app.add_url_rule("/", "index", main.index)
     app.add_url_rule("/lang/<lang>", "set_lang", main.set_lang)
+    app.add_url_rule("/login", "login", auth.login, methods=["GET", "POST"])
+    app.add_url_rule("/logout", "logout", auth.logout)
+    
+    @app.before_request
+    def require_login():
+        from flask import request, redirect, url_for, session
+        ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or request.remote_addr
+        if auth.is_blacklisted(ip or ""):
+            return (tr("auth.access_denied"), 403)
+        allowed = set(["static", "login", "set_lang"])
+        if request.endpoint and request.endpoint in allowed:
+            return None
+        if not session.get("auth"):
+            next_url = request.full_path if request.query_string else request.path
+            return redirect(url_for("login", next=next_url))
+        return None
     
     app.add_url_rule("/files", "browse", files.browse)
     app.add_url_rule("/upload", "upload", files.upload, methods=["POST"])
